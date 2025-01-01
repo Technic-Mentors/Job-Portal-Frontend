@@ -156,6 +156,8 @@ import AllJobCountries from "./Employer/AllJobCountries";
 import AllCities from "./Employer/AllCities";
 import EmployerAllJobCat from "./Employer/AllJobCat";
 import EmployerAllJobInd from "./Employer/AllJobIndustries";
+import PdfCvProvider from "./ContextApi/PdfCvProvider";
+import PdfCv from "./Adminside/Resume/PdfCv";
 
 function App() {
 
@@ -183,10 +185,12 @@ function App() {
                                             <ServicesCatProvider>
                                               <JobConProvider>
                                                 <JobCityProvider>
-                                                  <JobPortalNavbar />
-                                                  <Scrolltop />
-                                                  <AllRoutes />
-                                                  <Footer />
+                                                  <PdfCvProvider>
+                                                    <JobPortalNavbar />
+                                                    <Scrolltop />
+                                                    <AllRoutes />
+                                                    <Footer />
+                                                  </PdfCvProvider>
                                                 </JobCityProvider>
                                               </JobConProvider>
                                             </ServicesCatProvider>
@@ -220,9 +224,9 @@ function AllRoutes() {
     { path: "/", module: <MainHome /> },
     { path: "/sign-up", module: <Signup /> },
     { path: "/about", module: <About /> },
-    { path: "/contact", module: <Contact />},
-    { path: "/privacy-policy", module: <PrivacyPolicy />},
-    { path: "/terms-and-conditions", module: <TermsAndConditions />},
+    { path: "/contact", module: <Contact /> },
+    { path: "/privacy-policy", module: <PrivacyPolicy /> },
+    { path: "/terms-and-conditions", module: <TermsAndConditions /> },
     { path: "/jobs", module: <Jobs /> },
     { path: "/jobs-by-city", module: <JobsByCity /> },
     { path: "/jobs-by-industry", module: <JobsByIndustry /> },
@@ -302,6 +306,7 @@ function AllRoutes() {
         { path: "job-seeker-posts", module: <AllJobSeekers /> },
         { path: "view-job-seeker", module: <ViewJobSeeker /> },
         { path: "all-resumes", module: <AllResumes /> },
+        { path: "all-pdf-cvs", module: <PdfCv /> },
         { path: "add-resource", module: <AddResource /> },
         { path: "add-resource-category", module: <AddResourceCat /> },
         { path: "all-resources", module: <AllResource /> },
@@ -373,7 +378,7 @@ function AllRoutes() {
         { path: "all-job-cities", module: <AllCities /> },
       ],
     }
-  ]; 
+  ];
 
   return (
     <>

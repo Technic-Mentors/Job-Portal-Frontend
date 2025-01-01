@@ -161,6 +161,12 @@ export default function AdminPanel() {
       type: "adminLinks",
       icon: faTachometerAlt,
     },
+    {
+      path: "all-pdf-cvs",
+      title: "All Pdf Cvs",
+      type: "adminLinks",
+      icon: faTachometerAlt,
+    },
   ];
 
   return (
