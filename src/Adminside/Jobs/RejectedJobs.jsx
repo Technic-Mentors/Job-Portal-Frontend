@@ -16,7 +16,7 @@ function RejectedJobs() {
   // Filter first, then slice for pagination
   const lastJobIndex = currentPage * rejectedJobsPerPage;
   const firstJobIndex = lastJobIndex - rejectedJobsPerPage;
-  const currentRejectedJobs = rejectedJobs.slice(firstJobIndex, lastJobIndex);
+  const currentRejectedJobs = rejectedJobs?.reverse().slice(firstJobIndex, lastJobIndex);
 
   const totalPages = Math.ceil(rejectedJobs.length / rejectedJobsPerPage);
 

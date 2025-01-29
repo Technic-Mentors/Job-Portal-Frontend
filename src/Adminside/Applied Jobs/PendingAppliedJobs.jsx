@@ -9,6 +9,7 @@ import { Button } from "react-bootstrap"
 export default function PendingAppliedJobs() {
     const { jobRejection, jobApproval, getAppliedJobs, deleteApplicationById } = useContext(JobApplyContext)
 
+    const pendingAppliedJobs = getAppliedJobs?.filter(job => job.status === "Pending")
     // pagination
     const [currentPage, setCurrentPage] = useState(1)
     const [itemsPerPage, setItemsPerPage] = useState(25)
@@ -16,9 +17,9 @@ export default function PendingAppliedJobs() {
 
     const lastUserIndex = currentPage * applicationPerPage
     const firstApplicationIndex = lastUserIndex - applicationPerPage
-    const currentApplications = getAppliedJobs?.slice(firstApplicationIndex, lastUserIndex)
+    const currentApplications = pendingAppliedJobs?.slice(firstApplicationIndex, lastUserIndex)
 
-    const totalPages = Math.ceil(getAppliedJobs?.length / applicationPerPage)
+    const totalPages = Math.ceil(pendingAppliedJobs?.length / applicationPerPage)
 
     const goToPreviousPage = () => {
         setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))
@@ -44,7 +45,7 @@ export default function PendingAppliedJobs() {
                             <th>#</th>
                             <th>Applicant Name</th>
                             <th>Job Title</th>
-                            <th>Job City</th>
+                            <th>Profession</th>
                             <th>Manage</th>
                             <th>Actions</th>
                         </tr>
@@ -55,7 +56,7 @@ export default function PendingAppliedJobs() {
                                 <td>{firstApplicationIndex + index + 1}</td>
                                 <td>{applyJob.name}</td>
                                 <td>{applyJob.jobId?.title}</td>
-                                <td>{applyJob.jobId?.city}</td>
+                                <td>{applyJob.profession}</td>
                                 <td>
                                     <JobApplyViewModal applyJobId={applyJob._id} />
                                     <FontAwesomeIcon icon={faTrash} onClick={() => deleteApplicationById(applyJob._id)} />
@@ -91,7 +92,7 @@ export default function PendingAppliedJobs() {
                     </tbody>
                 </table>
             </div>
-            {getAppliedJobs?.length > applicationPerPage && (
+            {pendingAppliedJobs?.length > applicationPerPage && (
                 <div className="pagination-controls mt-3">
                     <Button onClick={goToPreviousPage} disabled={currentPage === 1}>
                         <FontAwesomeIcon icon={faAnglesLeft} />

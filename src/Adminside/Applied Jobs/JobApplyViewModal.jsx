@@ -25,26 +25,6 @@ export default function JobApplyViewModal({ applyJobId }) {
     setLgShow(true);
   };
 
-//   const jobPostForm = submittedJobsById.jobId && [
-//     { val: submittedJobsById.name, type: "text", lab: "Name" },
-//     { val: submittedJobsById.email, type: "text", lab: "Email" },
-//     { val: submittedJobsById.number, type: "text", lab: "Number" },
-//     { val: submittedJobsById.jobId.title, type: "text", lab: "Job Title" },
-//     { val: submittedJobsById.jobId.city, type: "text", lab: "Job City" },
-//     {
-//       val: submittedJobsById.currentSalary,
-//       type: "text",
-//       lab: "Current Salary",
-//     },
-//     {
-//       val: submittedJobsById.expectedSalary,
-//       type: "text",
-//       lab: "Expected Salary",
-//     },
-//     { val: submittedJobsById.relocation, type: "text", lab: "Relocation" },
-//     { val: submittedJobsById.resume, type: "File", lab: "Resume" },
-//   ];
-
   return (
     <>
       <FontAwesomeIcon
@@ -100,8 +80,8 @@ export default function JobApplyViewModal({ applyJobId }) {
               </Col>
               <Col md={4}>
                 <p className=" m-0">
-                  &nbsp;<span className="fw-bold">Job City:</span>{" "}
-                  {submittedJobsById.jobId?.city}
+                  &nbsp;<span className="fw-bold">Profession:</span>{" "}
+                  {submittedJobsById.profession}
                 </p>
               </Col>
               <Col md={4}>

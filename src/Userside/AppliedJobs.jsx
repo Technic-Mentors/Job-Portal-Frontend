@@ -47,17 +47,17 @@ export default function AppliedJobs() {
                             <th>#</th>
                             <th>Applicant Name</th>
                             <th>Job Title</th>
-                            <th>Job City</th>
+                            <th>Profession</th>
                             <th>Manage</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {currentApplications?.filter(applyJob => applyJob.email === signUser.email).map((applyJob, index) => (
+                        {currentApplications?.filter(applyJob => applyJob.email === signUser.email).reverse().map((applyJob, index) => (
                             <tr key={index}>
                                 <td>{index + 1}</td>
                                 <td>{applyJob.name}</td>
                                 <td>{applyJob.jobId?.title}</td>
-                                <td>{applyJob.jobId?.city}</td>
+                                <td>{applyJob.profession}</td>
                                 <td>
                                     <JobApplyViewModal applyJobId={applyJob._id} />
                                     <FontAwesomeIcon icon={faTrash} onClick={() => deleteApplicationById(applyJob._id)} />

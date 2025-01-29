@@ -68,7 +68,7 @@ function JobByField() {
                             className="me-3 latest-jobs-title"
                           >
                             <Link
-                              to={`/job-detail/${job._id}`}
+                              to={`/job-detail-page/${job._id}`}
                             >
                               <h5>
                                 {job.title.length > 50

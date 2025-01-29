@@ -513,6 +513,9 @@ box-shadow: none ;
   background-position: bottom center;
 }
 
+.list-the-jobs:hover{
+  background-color: #fafafa;
+}
 
 .interview-head{
   background-image: url("../src/assets/Images/interview-tips-bg.avif");
@@ -1280,3 +1283,9 @@ outline: none;
 }
 
 /* Contact form styles ends */
+
+@media (min-width:1000px) {
+  .role-filter{
+    width: 250px !important;
+  }
+}

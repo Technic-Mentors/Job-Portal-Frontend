@@ -19,7 +19,7 @@ function AllJobSeekers() {
 
   const lastUserIndex = currentPage * jobSeekersPerPage
   const firstJobSeekersIndex = lastUserIndex - jobSeekersPerPage
-  const currentJobSeekers = jobSeekers?.slice(firstJobSeekersIndex, lastUserIndex).filter(seekerPost => seekerPost.status !== "Pending").filter(seekerPost => seekerPost.status !== "N")
+  const currentJobSeekers = jobSeekers?.slice(firstJobSeekersIndex, lastUserIndex).filter(seekerPost => seekerPost.status !== "Pending").filter(seekerPost => seekerPost.status !== "N").filter(job => job.country.includes(country)).filter(job => job.title.toLowerCase().includes(searchTitle.toLocaleLowerCase())).filter(job => job.industry.includes(searchIndustry)).reverse()
 
   const totalPages = Math.ceil(jobSeekers.length / jobSeekersPerPage)
 
@@ -104,7 +104,7 @@ function AllJobSeekers() {
             </tr>
           </thead>
           <tbody>
-            {currentJobSeekers?.filter(job => job.country.includes(country)).filter(job => job.title.toLowerCase().includes(searchTitle.toLocaleLowerCase())).filter(job => job.industry.includes(searchIndustry)).reverse().map((seekerPost, index) => {
+            {currentJobSeekers?.map((seekerPost, index) => {
               return <tr key={index}>
                 <td>{firstJobSeekersIndex + index + 1}</td>
                 <td>{seekerPost.title}</td>

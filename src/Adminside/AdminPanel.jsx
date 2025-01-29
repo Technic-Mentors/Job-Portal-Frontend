@@ -15,6 +15,7 @@ import {
   faBuilding,
   faCheck,
   faFile,
+  faFilePdf,
   faHourglassHalf,
   faLayerGroup,
   faMicrophone,
@@ -162,10 +163,10 @@ export default function AdminPanel() {
       icon: faTachometerAlt,
     },
     {
-      path: "all-pdf-cvs",
-      title: "All Pdf Cvs",
+      path: "uploaded-cv",
+      title: "Uploaded PDF CVs",
       type: "adminLinks",
-      icon: faTachometerAlt,
+      icon: faFilePdf,
     },
   ];
 

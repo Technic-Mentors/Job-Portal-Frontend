@@ -1,17 +1,20 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { Button, Card } from "react-bootstrap";
 import { useParams } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import JobApplyForm from "./JobApplyForm";
 import companyDefaultImg from '../../assets/Images/company-default-img.avif'
 import Swal from "sweetalert2";
 import UserContext from "../../ContextApi/UserContext";
-import { faClose } from "@fortawesome/free-solid-svg-icons";
+import { faClose, faShareAlt } from "@fortawesome/free-solid-svg-icons";
+import jobContext from "../../ContextApi/JobContext";
 
 function JobDetail() {
   const { signUser } = useContext(UserContext)
-  const [postedJobsById, setPostedJobByTitle] = useState([]);
+  const { setColAdjust, setPostedJobsById, postedJobsById } = useContext(jobContext)
   const { id } = useParams();
+
   const apiUrl = import.meta.env.VITE_API_URL;
 
   const jobByTitle = async () => {
@@ -25,8 +28,12 @@ function JobDetail() {
       }
     );
     const data = await res.json();
-    setPostedJobByTitle(data);
+    setPostedJobsById(data);
   };
+
+  useEffect(() => {
+    jobByTitle(id)
+  }, [id])
 
   const saveJob = (job) => {
     if (signUser?.role) {
@@ -57,16 +64,45 @@ function JobDetail() {
     return differenceInDays === 0 ? "Today" : `${differenceInDays + 1} days ago`;
   };
 
+  const onClosFeClick = () => {
+    setColAdjust(12)
+    setPostedJobsById([])
+    window.history.replaceState(null, "", "/jobs");
+  }
+
+  const shareOnWhatsApp = () => {
+    const jobUrl = `https://nexstore.pk/job/${id}`;
+    const message = `Check out this job opportunity: ${postedJobsById.title}\n\n${jobUrl}`;
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+    window.open(whatsappUrl, "_blank");
+  };
 
   return (
     <>
+      {postedJobsById && (
+        <Helmet>
+          <title>{postedJobsById?.title}</title>
+          <meta name="description" content={postedJobsById.description || "Job details available here"} />
+          <meta property="og:title" content={postedJobsById.title} />
+          <meta property="og:description" content={postedJobsById.description} />
+          <meta property="og:type" content="website" />
+          <meta property="og:url" content={window.location.href} />
+          <meta
+            property="og:image"
+            content={postedJobsById.jobImage || companyDefaultImg}
+          />
+        </Helmet>
+      )}
+
+
       <section
         className="job-detail"
         style={{ backgroundColor: "#F2F5F8" }}
       >
         <Card className="detail-head p-4" style={{ overflowY: "auto", height: "100vh" }}>
           <div className="d-flex justify-content-end">
-            <FontAwesomeIcon icon={faClose} onClick={() => setColAdjust(12)} style={{ fontSize: "25px", color: "#9a9a9a", cursor: "pointer" }}></FontAwesomeIcon>
+            <FontAwesomeIcon icon={faClose} onClick={() => onClosFeClick()} style={{ fontSize: "25px", color: "#9a9a9a", cursor: "pointer" }}></FontAwesomeIcon>
           </div>
           <div className="detail-wrapper d-flex align-items-center">
             <div
@@ -115,18 +151,21 @@ function JobDetail() {
             </div>
           </div>
           <div className="row">
-            <div className="col-md-12 d-flex">
+            <div className="col-md-12 d-flex justify-content-between">
               <div className="me-2">
                 <JobApplyForm jobApplyId={postedJobsById._id} />
               </div>
               <div className="">
                 <Button className="d-flex align-items-center " onClick={() => saveJob(postedJobsById)} style={{ padding: "5px 55px", backgroundColor: "transparent", color: "var(--primary-color)" }}><i className="fa fa-heart"></i>&nbsp;Save</Button>
               </div>
+              <div className="">
+                <FontAwesomeIcon icon={faShareAlt} onClick={shareOnWhatsApp} style={{ cursor: "pointer" }}></FontAwesomeIcon>
+              </div>
             </div>
           </div>
           <hr />
           <div className="mt-2">
-            <h3>Job Description</h3>
+            <h5>Job Description</h5>
             <p
               className="m-0"
               dangerouslySetInnerHTML={{
@@ -135,7 +174,7 @@ function JobDetail() {
             ></p>
           </div>
           <div className="mt-3">
-            <h3>Job Requirements</h3>
+            <h5>Job Requirements</h5>
             <p
               className="m-0"
               dangerouslySetInnerHTML={{
@@ -146,7 +185,7 @@ function JobDetail() {
 
           {postedJobsById.perks ? (
             <div className="mt-3">
-              <h3>Perks & Benefits</h3>
+              <h5>Perks & Benefits</h5>
               <p
                 className="m-0"
                 dangerouslySetInnerHTML={{
@@ -158,7 +197,7 @@ function JobDetail() {
 
           {postedJobsById.aboutCompany ? (
             <div className="mt-3">
-              <h3>About Company</h3>
+              <h5>About Company</h5>
               <p
                 className="m-0"
                 dangerouslySetInnerHTML={{

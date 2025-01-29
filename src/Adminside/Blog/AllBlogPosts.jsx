@@ -144,7 +144,7 @@ export default function AllBlogPosts() {
 
   const lastPostIndex = currentPage * postPerPage
   const firstUserIndex = lastPostIndex - postPerPage
-  const currentPosts = filteredPosts?.slice(firstUserIndex, lastPostIndex)
+  const currentPosts = filteredPosts?.slice(firstUserIndex, lastPostIndex).reverse()
 
   const totalPages = Math.ceil(filteredPosts.length / postPerPage)
 
@@ -215,7 +215,7 @@ export default function AllBlogPosts() {
             </tr>
           </thead>
           <tbody>
-            {currentPosts.slice().reverse().map((posts, index) => {
+            {currentPosts.slice().map((posts, index) => {
               return (
                 <tr key={index}>
                   <td>{index + 1}</td>

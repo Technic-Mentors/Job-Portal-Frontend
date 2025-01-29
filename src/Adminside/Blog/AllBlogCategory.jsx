@@ -103,7 +103,7 @@ export default function AllBlogCategory() {
   // Pagination logic
   const indexOfLastCategory = currentPage * catPerPage;
   const indexOfFirstCategory = indexOfLastCategory - catPerPage;
-  const currentCategories = category?.slice(indexOfFirstCategory, indexOfLastCategory);
+  const currentCategories = category?.slice(indexOfFirstCategory, indexOfLastCategory).reverse();
 
   // Total pages for pagination
   const totalPages = Math.ceil(category?.length / catPerPage);
@@ -152,7 +152,7 @@ export default function AllBlogCategory() {
 
           <tbody>
             {currentCategories &&
-              currentCategories.reverse().map((post, index) => {
+              currentCategories.map((post, index) => {
                 return (
                   <tr key={index}>
                     <td>{index + 1}</td>

@@ -16,7 +16,7 @@ function Employer() {
   const employers = addedUsers?.filter((user) => user.role === "Employer") || [];
   const lastUserIndex = currentPage * userPerPage;
   const firstUserIndex = lastUserIndex - userPerPage;
-  const currentUsers = employers.slice(firstUserIndex, lastUserIndex);
+  const currentUsers = employers?.reverse().slice(firstUserIndex, lastUserIndex);
 
   const totalPages = Math.ceil(employers.length / userPerPage);
 
@@ -51,7 +51,7 @@ function Employer() {
             </tr>
           </thead>
           <tbody>
-            {currentUsers.reverse().map((user, index) => (
+            {currentUsers.map((user, index) => (
               <tr key={user._id}>
                 <td>{firstUserIndex + index + 1}</td>
                 <td>{user.name}</td>

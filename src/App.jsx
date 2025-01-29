@@ -158,6 +158,8 @@ import EmployerAllJobCat from "./Employer/AllJobCat";
 import EmployerAllJobInd from "./Employer/AllJobIndustries";
 import PdfCvProvider from "./ContextApi/PdfCvProvider";
 import PdfCv from "./Adminside/Resume/PdfCv";
+import { HelmetProvider } from "react-helmet-async";
+import JobDetailPage from "./Pages/Jobs/JobDetailPage";
 
 function App() {
 
@@ -186,10 +188,12 @@ function App() {
                                               <JobConProvider>
                                                 <JobCityProvider>
                                                   <PdfCvProvider>
-                                                    <JobPortalNavbar />
-                                                    <Scrolltop />
-                                                    <AllRoutes />
-                                                    <Footer />
+                                                    <HelmetProvider>
+                                                      <JobPortalNavbar />
+                                                      <Scrolltop />
+                                                      <AllRoutes />
+                                                      <Footer />
+                                                    </HelmetProvider>
                                                   </PdfCvProvider>
                                                 </JobCityProvider>
                                               </JobConProvider>
@@ -227,13 +231,8 @@ function AllRoutes() {
     { path: "/contact", module: <Contact /> },
     { path: "/privacy-policy", module: <PrivacyPolicy /> },
     { path: "/terms-and-conditions", module: <TermsAndConditions /> },
-    { path: "/jobs", module: <Jobs /> },
-    { path: "/jobs-by-city", module: <JobsByCity /> },
-    { path: "/jobs-by-industry", module: <JobsByIndustry /> },
-    { path: "/jobs-by-country", module: <CountryWiseJobs /> },
-    { path: "/jobs-by-category", module: <JobsByCategory /> },
-    { path: "/remote-jobs", module: <WorkFromHomeJobs /> },
     { path: "/job-detail/:id", module: <JobDetail /> },
+    { path: "/job-detail-page/:id", module: <JobDetailPage /> },
     { path: "/interviews", module: <Interview /> },
     { path: "/interview-scheduler", module: <InterviewScheduler /> },
     { path: "/interview-tips-and-tricks", module: <InterviewTips /> },
@@ -306,7 +305,7 @@ function AllRoutes() {
         { path: "job-seeker-posts", module: <AllJobSeekers /> },
         { path: "view-job-seeker", module: <ViewJobSeeker /> },
         { path: "all-resumes", module: <AllResumes /> },
-        { path: "all-pdf-cvs", module: <PdfCv /> },
+        { path: "uploaded-cv", module: <PdfCv /> },
         { path: "add-resource", module: <AddResource /> },
         { path: "add-resource-category", module: <AddResourceCat /> },
         { path: "all-resources", module: <AllResource /> },
@@ -393,6 +392,24 @@ function AllRoutes() {
               />
             );
           })}
+        <Route path="/jobs" element={<Jobs />}>
+          <Route path="job-detail/:id" element={< JobDetail />} />
+        </Route>
+        <Route path="/remote-jobs" element={<WorkFromHomeJobs />}>
+          <Route path="job-detail/:id" element={< JobDetail />} />
+        </Route>
+        <Route path="/jobs-by-country" element={<CountryWiseJobs />}>
+          <Route path="job-detail/:id" element={< JobDetail />} />
+        </Route>
+        <Route path="/jobs-by-category" element={<JobsByCategory />}>
+          <Route path="job-detail/:id" element={< JobDetail />} />
+        </Route>
+        <Route path="/jobs-by-city" element={<JobsByCity />}>
+          <Route path="job-detail/:id" element={< JobDetail />} />
+        </Route>
+        <Route path="/jobs-by-industry" element={<JobsByIndustry />}>
+          <Route path="job-detail/:id" element={< JobDetail />} />
+        </Route>
         {signUser?.role === "Admin" && (
           adminRoutes &&
           adminRoutes.map((routes, index) => (

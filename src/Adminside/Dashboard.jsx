@@ -76,7 +76,7 @@ function Dashboard() {
                     </div>
                     <div className="dash-text">
                       <h6>{recentApply.jobId?.title}</h6>
-                      <p>{recentApply.jobId?.city}</p>
+                      <p className="mt-2">{recentApply.name}</p>
                     </div>
                   </div>
                 })}

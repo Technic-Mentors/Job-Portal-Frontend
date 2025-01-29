@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import CourseModals from "./CourseModals"
 import CategoryContext from "../../ContextApi/CategoryContext";
@@ -6,12 +6,18 @@ import CourseContext from "../../ContextApi/CourseContext";
 import { Button, Modal } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAnglesLeft, faAnglesRight } from "@fortawesome/free-solid-svg-icons";
+import jsPDF from "jspdf";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import 'jspdf-autotable';
+import UserContext from "../../ContextApi/UserContext";
 
 export default function Addcourse() {
   const { category, AllCategory } = useContext(CategoryContext);
   const [lgShow, setLgShow] = useState(false);
   const apiUrl = import.meta.env.VITE_API_URL;
-
+  const { signUser } = useContext(UserContext)
+  const [report, setReport] = useState("")
   const { deleteCourse, allCourse, allCourses } = useContext(CourseContext);
 
   const [searchOption, setSearchOption] = useState("");
@@ -149,7 +155,7 @@ export default function Addcourse() {
       timeSlot: 50,
       days: 50,
     };
-  
+
     if (value.length <= maxLengths[name]) {
       setCourse({ ...course, [name]: value });
     } else {
@@ -157,7 +163,8 @@ export default function Addcourse() {
       console.log(`Max length for ${name} is ${maxLengths[name]} characters.`);
     }
   };
-  
+
+  const filterCourses = allCourse?.filter(course => course.title.toLowerCase().includes(searchOption.toLowerCase())).filter(course => course.categoryId?._id.includes(searchCategory))
 
   // pagination
   const [currentPage, setCurrentPage] = useState(1)
@@ -166,9 +173,9 @@ export default function Addcourse() {
 
   const lastCourseIndex = currentPage * coursePerPage
   const firstCourseIndex = lastCourseIndex - coursePerPage
-  const currentCourse = allCourse?.slice(firstCourseIndex, lastCourseIndex)
+  const currentCourse = filterCourses?.reverse().slice(firstCourseIndex, lastCourseIndex)
 
-  const totalPages = Math.ceil(allCourse.length / coursePerPage)
+  const totalPages = Math.ceil(filterCourses.length / coursePerPage)
 
   const goToPreviousPage = () => {
     setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))
@@ -176,6 +183,89 @@ export default function Addcourse() {
   const goToNextPage = () => {
     setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages))
   }
+
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    const currentDate = new Date();
+    const formattedDate = currentDate.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+    });
+
+    doc.setFontSize(13);
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const title = "AIG Jobs - Courses Report";
+    const titleWidth = doc.getTextWidth(title);
+    const titleX = (pageWidth - titleWidth) / 2;
+    doc.text(title, titleX, 10);
+    doc.text(`Generated On: ${formattedDate}`, 14, 20);
+
+    doc.autoTable({
+      head: [["Course Title", "Duration", "Category", "Level", "Instructor"]],
+      body: currentCourse.map(course => [
+        course.title,
+        course.duration,
+        course.categoryId?.category,
+        course.level,
+        course.instructorName,
+      ]),
+      startY: 30,
+      headStyles: { fontSize: 8 },
+      bodyStyles: { fontSize: 8 },
+    });
+
+    doc.save("jobs_report.pdf");
+  };
+
+  const generateExcel = () => {
+    const headers = [
+      "Course Title", "Duration", "Category", "Level", "Instructor"
+    ];
+
+    const data = currentCourse.map(course => [
+      course.title,
+      course.duration,
+      course.categoryId?.category,
+      course.level,
+      course.instructorName,
+    ]);
+
+    const excelData = [headers, ...data];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(excelData);
+
+    const columnWidths = headers.map((header, index) => ({
+      wch: Math.max(
+        header.length,
+        ...data.map((row) => (row[index] ? row[index].toString().length : 0)) // Cell content width
+      ),
+    }));
+
+    worksheet["!cols"] = columnWidths;
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Posted Jobs");
+
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(blob, "jobs_report.xlsx");
+  };
+
+  useEffect(() => {
+    if (report) {
+      if (report === "PDFReport") {
+        generatePDF()
+      } else {
+        generateExcel()
+      }
+      setReport("")
+    }
+  }, [report])
 
   return (
     <div className="container mt-3">
@@ -231,30 +321,38 @@ export default function Addcourse() {
                   </tr>
                 </thead>
                 <tbody>
-                  {currentCourse?.filter(course => course.title.toLowerCase().includes(searchOption.toLowerCase())).filter(course => course.categoryId?._id.includes(searchCategory)).map((course, index) => {
+                  {currentCourse?.map((course, index) => {
                     return (
-                        <tr key={index}>
-                          <td>{index + 1}</td>
-                          <td>{course.title}</td>
-                          <td>
-                            {course && course.categoryId?.category}
-                          </td>
-                          <td>{course.duration}</td>
-                          <td>
-                            <CourseModals courseId={course._id} />
-                            <i
-                              className="fa fa-trash"
-                              onClick={() => deleteCourse(course._id)}
-                            ></i>
-                          </td>
-                        </tr>
-                      );
-                    })}
+                      <tr key={index}>
+                        <td>{index + 1}</td>
+                        <td>{course.title}</td>
+                        <td>
+                          {course && course.categoryId?.category}
+                        </td>
+                        <td>{course.duration}</td>
+                        <td>
+                          <CourseModals courseId={course._id} />
+                          <i
+                            className="fa fa-trash"
+                            onClick={() => deleteCourse(course._id)}
+                          ></i>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
           </div>
-          {allCourse?.length > coursePerPage && (
+          {signUser?.role === "Admin" && (
+            <select className="form-control mt-4" value="" style={{ width: "20%", border: "1px solid #0d6efd" }} onChange={(e) => setReport(e.target.value)}>
+              <option value="">Generate Report</option>
+              <option value="PDFReport">PDF Report</option>
+              <option value="excelReport">Excel Report</option>
+            </select>
+          )}
+
+          {filterCourses?.length > coursePerPage && (
             <div className="pagination-controls mt-3">
               <Button onClick={goToPreviousPage} disabled={currentPage === 1}>
                 <FontAwesomeIcon icon={faAnglesLeft} />

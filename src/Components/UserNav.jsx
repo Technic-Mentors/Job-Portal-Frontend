@@ -29,8 +29,6 @@ function UserNav() {
   const { allInterviews } = useContext(InterviewContext)
   const { allServices } = useContext(ServicesContext)
 
-
-
   const navigate = useNavigate()
 
   const categorySetHere = uniqueCategory && [...uniqueCategory].slice(0, 5).map((category) => {

@@ -152,7 +152,7 @@ export default function AddJobs() {
             ? "Job added successfully!"
             : "Job is submitted for approval",
         showConfirmButton: true,
-        
+
       });
       setJobItems({
         title: "",

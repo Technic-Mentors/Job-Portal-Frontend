@@ -8,7 +8,7 @@ import UserContext from "../../ContextApi/UserContext";
 import PdfCvUpload from "../../Userside/PdfCvUpload";
 
 function PdfCv() {
-    const { allPdfCvs, delcvById } = useContext(PdfCvContext);
+    const { allPdfCvs, delPdfCV } = useContext(PdfCvContext);
 
     const { signUser } = useContext(UserContext);
     const [searchName, setSearchName] = useState("")
@@ -106,7 +106,7 @@ function PdfCv() {
                                         border: "none",
                                     }}>View Cv</button></a></td>
                                     <td>
-                                        <FontAwesomeIcon icon={faTrash} onClick={() => delcvById(cv._id)} />
+                                        <FontAwesomeIcon icon={faTrash} onClick={() => delPdfCV(cv._id)} />
                                     </td>
                                 </tr>
                             );

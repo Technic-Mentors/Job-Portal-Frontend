@@ -3,6 +3,7 @@ import UserContext from "../ContextApi/UserContext";
 import { Form, Button, Container, Row, Col, FloatingLabel } from "react-bootstrap";
 import Swal from 'sweetalert2'
 import ResumeContext from "../ContextApi/ResumeContext";
+import emailjs from '@emailjs/browser';
 
 const CreateResume = () => {
     const { signUser } = useContext(UserContext);
@@ -63,6 +64,20 @@ const CreateResume = () => {
                 text: "Resume created successfully!",
                 icon: "success"
             });
+
+            const name = signUser.name
+            const email = signUser.email
+
+            emailjs
+                .send(
+                    "service_42tlu3f",
+                    "template_uv4fizf",
+                    {
+                        name: name,
+                        email: email,
+                    },
+                    "IS4D954-DxAOC9p8E"
+                )
             allResumes()
             setFormData({
                 name: "",
@@ -197,20 +212,20 @@ const CreateResume = () => {
                             />
                         </FloatingLabel>
                     </Col>
-                        <FloatingLabel
-                            controlId="floatingNumber"
-                            label={<span>Profession <span style={{ color: "red" }}>*</span></span>}
-                            className="mb-3"
-                        >
-                            <Form.Control
-                                type="text"
-                                name="profession"
-                                placeholder="profession"
-                                value={formData.profession}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </FloatingLabel>
+                    <FloatingLabel
+                        controlId="floatingNumber"
+                        label={<span>Profession <span style={{ color: "red" }}>*</span></span>}
+                        className="mb-3"
+                    >
+                        <Form.Control
+                            type="text"
+                            name="profession"
+                            placeholder="profession"
+                            value={formData.profession}
+                            onChange={handleInputChange}
+                            required
+                        />
+                    </FloatingLabel>
                     <FloatingLabel
                         controlId="floatingImage"
                         label="Upload Image"

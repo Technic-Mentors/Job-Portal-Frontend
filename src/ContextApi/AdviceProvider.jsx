@@ -19,7 +19,6 @@ export default function AdviceProvider({children}) {
     setPostedAdvices(data)
  }
 
-
  const adviceById = async (id) => {
     const res = await fetch(`${apiUrl}/api/advice/getAdvicesId/${id}`, {
         method: "GET",

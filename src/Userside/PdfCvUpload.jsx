@@ -1,6 +1,8 @@
 import { useContext, useState } from "react"
 import { Button, FloatingLabel, Form, Modal } from "react-bootstrap";
 import UserContext from "../ContextApi/UserContext";
+import PdfCvContext from "../ContextApi/PdfCvContext";
+import Swal from "sweetalert2";
 
 export default function PdfCvUpload() {
     const [pdfCvCred, setPdfCvCred] = useState({
@@ -9,6 +11,7 @@ export default function PdfCvUpload() {
     })
     const { signUser } = useContext(UserContext)
     const apiUrl = import.meta.env.VITE_API_URL;
+    const {getALlPdfCvs} = useContext(PdfCvContext)
 
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
@@ -32,6 +35,13 @@ export default function PdfCvUpload() {
             : (formError.innerText = "");
 
         if (res.ok) {
+            Swal.fire({
+                    position: "center",
+                    icon: "success",
+                    title: "CV uploaded successfully!",
+                    showConfirmButton: true,
+                  });
+            getALlPdfCvs();
             setPdfCvCred({
                 profession: "",
                 cv: ""

@@ -2,11 +2,14 @@ import { useEffect, useState } from "react";
 import jobContext from "./JobContext";
 import PropTypes from "prop-types";
 import { Country } from "country-state-city";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 export default function JobProvider({ children }) {
   const apiUrl = import.meta.env.VITE_API_URL;
+    const [colAdjust, setColAdjust] = useState(12)
+    const {pathname} = useLocation()
+    const [postedJobsById, setPostedJobsById] = useState("")
   const navigate = useNavigate();
   const [jobTitle, setJobTitle] = useState("");
   const [jobCounting, setJobCounting] = useState("");
@@ -205,6 +208,10 @@ export default function JobProvider({ children }) {
     setPostedJobCountries(countries);
   }, [postedJobs]);
 
+  useEffect(() => {
+    pathname.includes("job-detail") ? setColAdjust(6) : setColAdjust(12)
+  }, [pathname])
+
   return (
     <jobContext.Provider
       value={{
@@ -227,6 +234,10 @@ export default function JobProvider({ children }) {
         jobRejection,
         pendingJobs,
         rejectedJobs,
+        postedJobsById, 
+        setPostedJobsById,
+        colAdjust, 
+        setColAdjust
       }}
     >
       {children}

@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ResumeContext from "../ContextApi/ResumeContext";
 import UserContext from "../ContextApi/UserContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -6,17 +6,18 @@ import { faAnglesLeft, faAnglesRight, faTrash } from "@fortawesome/free-solid-sv
 import ViewResumeModal from "./ViewResumeModal";
 import { Button } from "react-bootstrap";
 import EditResume from "./EditResume";
-import jsPDF from 'jspdf';
+import jsPDF from "jspdf";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 import 'jspdf-autotable';
-import LOGO from "../../src/assets/Images/Latest-Logo.png";
 
 function Resume() {
   const { getAllResume, delResumeById } = useContext(ResumeContext);
-
+  const [report, setReport] = useState("")
   const { signUser } = useContext(UserContext);
   const [searchName, setSearchName] = useState("")
   const [searchProfession, setSearchProfession] = useState("")
-  const filteredResume = signUser?.role === "Admin" ? getAllResume : getAllResume?.filter(resume => resume.email === signUser.email);
+  const filteredResume = signUser?.role === "Admin" ? getAllResume?.filter(resume => resume.name.toLowerCase().includes(searchName.toLowerCase())).filter(resume => resume.profession?.toLowerCase().includes(searchProfession.toLowerCase())) : getAllResume?.filter(resume => resume.email === signUser.email).filter(resume => resume.name.toLowerCase().includes(searchName.toLowerCase())).filter(resume => resume.profession?.toLowerCase().includes(searchProfession.toLowerCase()));
 
   // Pagination 
   const [currentPage, setCurrentPage] = useState(1);
@@ -25,7 +26,7 @@ function Resume() {
 
   const lastIndex = currentPage * resumePerPage;
   const firstIndex = lastIndex - resumePerPage;
-  const currentItems = filteredResume.slice(firstIndex, lastIndex);
+  const currentItems = filteredResume?.reverse().slice(firstIndex, lastIndex);
 
   const totalPages = Math.ceil(filteredResume.length / resumePerPage);
 
@@ -41,50 +42,95 @@ function Resume() {
     }
   };
 
-  const generatePDF = async () => {
+  const generatePDF = () => {
     const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
     const currentDate = new Date();
     const formattedDate = currentDate.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
     });
 
-    try {
-        // Directly use LOGO if it is a base64 string
-        doc.addImage(LOGO, 'PNG', 10, 10, 50, 30); // Adjust position and size as needed
+    doc.setFontSize(13);
 
-        // Add text
-        doc.setFontSize(13);
-        doc.text('Resume Report', doc.internal.pageSize.getWidth() / 2, 50, { align: 'center' });
+    const title = "AIG Jobs - Resume Report";
+    const titleWidth = doc.getTextWidth(title);
+    const titleX = (pageWidth - titleWidth) / 2;
+    doc.text(title, titleX, 10);
 
-        doc.text(`Generated On: ${formattedDate}`, 14, 60);
+    doc.text(`Generated On: ${formattedDate}`, 14, 20);
 
-        // Add table
-        doc.autoTable({
-            head: [["Name", "Email", "Contact", "Profession", "Total Work Experience"]],
-            body: currentItems.map(resume => [
-                resume.name,
-                resume.email,
-                resume.number,
-                resume.profession,
-                resume.totalWorkExp,
-            ]),
-            startY: 70,
-            headStyles: { fontSize: 8 },
-            bodyStyles: { fontSize: 8 },
-        });
+    doc.autoTable({
+      head: [["Name", "Email", "Contact", "Profession", "Total Work Experience"]],
+      body: currentItems.map(resume => [
+        resume.name,
+        resume.email,
+        resume.number,
+        resume.profession,
+        resume.totalWorkExp,
+      ]),
+      startY: 30,
+      headStyles: { fontSize: 8 },
+      bodyStyles: { fontSize: 8 },
+    });
 
-        doc.save('jobs_report.pdf');
-    } catch (error) {
-        console.error("Error generating PDF:", error);
+    doc.save("jobs_report.pdf");
+  };
+
+  const generateExcel = () => {
+    const headers = [
+      "Name", "Email", "Contact", "Profession", "Total Work Experience"
+    ];
+
+    const data = currentItems.map(resume => [
+      resume.name,
+      resume.email,
+      resume.number,
+      resume.profession,
+      resume.totalWorkExp,
+    ]);
+
+    const excelData = [headers, ...data];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(excelData);
+
+    const columnWidths = headers.map((header, index) => ({
+      wch: Math.max(
+        header.length,
+        ...data.map((row) => (row[index] ? row[index].toString().length : 0))
+      ),
+    }));
+
+    worksheet["!cols"] = columnWidths;
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Posted Jobs");
+
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(blob, "jobs_report.xlsx");
+  };
+
+  useEffect(() => {
+    if (report) {
+      if (report === "PDFReport") {
+        generatePDF()
+      } else {
+        generateExcel()
+      }
+      setReport("")
     }
-};
+  }, [report])
 
   return (
     <>
       <div className="row mb-4 find d-flex">
-<h2>All Resumes List</h2>
+        <h2>All Resumes List</h2>
         <div className="col-md-4 mt-4">
           <input
             type="text"
@@ -126,7 +172,7 @@ function Resume() {
             </tr>
           </thead>
           <tbody>
-            {currentItems?.filter(resume => resume.name.toLowerCase().includes(searchName.toLowerCase())).filter(resume => resume.profession?.toLowerCase().includes(searchProfession.toLowerCase())).map((resume, index) => {
+            {currentItems?.map((resume, index) => {
               return (
                 <tr key={index}>
                   <td>{firstIndex + index + 1}</td>
@@ -145,7 +191,13 @@ function Resume() {
             })}
           </tbody>
         </table>
-        <Button onClick={generatePDF} variant="primary" className="mt-3">Download Job Report</Button>
+        {signUser?.role === "Admin" && (
+          <select className="form-control mt-4" value="" style={{ width: "20%", border: "1px solid #0d6efd" }} onChange={(e) => setReport(e.target.value)}>
+            <option value="">Generate Report</option>
+            <option value="PDFReport">PDF Report</option>
+            <option value="excelReport">Excel Report</option>
+          </select>
+        )}
       </div>
 
       {/* {/ Pagination Controls /} */}

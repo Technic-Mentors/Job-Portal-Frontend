@@ -23,7 +23,7 @@ export default function JobCountryProvider({ children }) {
       asianCountryCodes.includes(country.isoCode)
     );
     setJobCountries(filterAsianContries);
-    if (pathname !== "/jobs" && pathname !=="/jobs-by-country") {
+    if (pathname !== "/jobs" && pathname !== "/jobs-by-country" && !pathname.includes("job-detail")) {
       setCountry("")
     }
   }, [pathname]);
@@ -42,7 +42,7 @@ export default function JobCountryProvider({ children }) {
 
       setCities(uniqueCities);
     }
-  }; 
+  };
 
   return (
     <JobCountriesContext.Provider

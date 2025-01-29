@@ -6,20 +6,20 @@ import defaultCompany from "../../assets/Images/company-default-img.avif";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBookmark,
-  faExternalLinkAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import UserContext from "../../ContextApi/UserContext";
 import jobConContext from "../../ContextApi/JobConContext";
+import { Link, Outlet } from "react-router-dom";
 
 function CountryWiseJobs() {
-  const { postedJobs } = useContext(jobContext);
+  const { postedJobs, colAdjust, setColAdjust } = useContext(jobContext);
   const { country, setCountry } = useContext(jobConContext);
   const { signUser } = useContext(UserContext);
+
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
   const [filterCity, setFilterCity] = useState(null);
-  console.log(country);
 
   const [selectedType, setSelectedType] = useState(null);
   const [filterType, setFilterType] = useState(null);
@@ -86,11 +86,16 @@ function CountryWiseJobs() {
 
   const jobTypeArray = [{ type: "Full Time" }, { type: "Part Time" }];
   const formatDate = (jobDate) => {
-    return new Date(jobDate).toLocaleDateString();
+    const todayDate = new Date();
+    const jobPostedDate = new Date(jobDate);
+    const differenceInTime = todayDate - jobPostedDate; // Difference in milliseconds
+    const differenceInDays = Math.floor(differenceInTime / (1000 * 60 * 60 * 24)); // Convert ms to days
+    return differenceInDays === 0 ? "Today" : `${differenceInDays + 1} days ago`;
   };
+
   return (
     <>
-      <section className="job-head">
+      {/* <section className="job-head">
         <div className="page-head-overlay">
           <Container>
             <Row className="justify-content-center align-items-center py-6">
@@ -102,9 +107,9 @@ function CountryWiseJobs() {
             </Row>
           </Container>
         </div>
-      </section>
+      </section> */}
 
-      <section className="interview-section py-4">
+      <section className="interview-section pb-4">
         <Container fluid className="px-lg-4">
           <Row className="mt-5 g-4 justify-content-center">
             <Col md={3}>
@@ -282,84 +287,54 @@ function CountryWiseJobs() {
                 <hr />
               </div>
               <Row>
-                <Col md={12}>
-                  <div className="table-responsive-sm ">
+                <Col md={colAdjust}>
+                  <div className="alldetails bg-white p-4">
+                    {filteredJobs?.reverse().map((alljobs, index) => (
+                      <Link key={index} to={`job-detail/${alljobs._id}`} onClick={() => setColAdjust(6)}>
+                        <div className="list-the-jobs px-3" key={index} style={{ cursor: "pointer" }}>
+                          <div className="d-flex justify-content-between">
+                            <span style={{ color: "var(--primary-color)", fontWeight: '550' }} >{alljobs.title}</span>
+                            <FontAwesomeIcon
+                              icon={faBookmark}
+                              onClick={() => saveJob(alljobs._id)}
+                              className="m-3"
+                              style={{ cursor: 'pointer' }}
+                            />
+                          </div>
+                          <div className="d-flex mt-2">
+                            <div className="logo me-2">
+                              {alljobs.jobImage ? (
 
-                    <table className="admin-table">
-                      <thead>
-                        <tr className="form-title">
-                          <th>Title</th>
-                          <th>Location</th>
-                          <th>Date</th>
-                          <th>Company</th>
-                          <th>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredJobs &&
-                          filteredJobs.map((alljobs, index) => {
-                            return (
-                              <tr key={index}>
-                                <td>
-                                  <span
-                                    style={{
-                                      color: "var(--primary-color)",
-                                      fontWeight: "550",
-                                    }}
-                                  >
-                                    {alljobs.title}
-                                  </span>
-                                  <br />
-                                  <span style={{ color: "grey" }}>
-                                    {alljobs.companyName}
-                                  </span>
-                                </td>
-                                <td>{alljobs.city?.city}</td>
-                                <td>{formatDate(alljobs.createdAt)}</td>
-                                <td>
-                                  {alljobs.jobImage ? (
-                                    <img
-                                      src={alljobs.jobImage}
-                                      alt=""
-                                      className="img-fluid"
-                                      style={{ height: "40px", width: "40px" }}
-                                    />
-                                  ) : (
-                                    <img
-                                      src={defaultCompany}
-                                      alt=""
-                                      className="img-fluid"
-                                      style={{ height: "40px", width: "40px" }}
-                                    />
-                                  )}
-                                </td>
-                                <td>
-                                  <a
-                                    href={`/job-detail/${alljobs._id}`}
-                                    target="blank"
-                                  >
-                                    <FontAwesomeIcon
-                                      icon={faExternalLinkAlt}
-                                      style={{
-                                        color: "blue",
-                                        marginRight: "10px",
-                                        cursor: "pointer",
-                                      }}
-                                    />
-                                  </a>
-                                  <FontAwesomeIcon
-                                    icon={faBookmark}
-                                    style={{ color: "", cursor: "pointer" }}
-                                    onClick={() => saveJob(alljobs)}
-                                  />
-                                </td>
-                              </tr>
-                            );
-                          })}
-                      </tbody>
-                    </table>
+                                <img src={alljobs.jobImage} alt="" className="img-fluid" style={{ width: "40px", height: "40px" }} />
+                              ) : (
+                                <img src={defaultCompany} alt="" className="img-fluid" style={{ width: "40px", height: "40px" }} />
+                              )}
+                            </div>
+                            <div className="me-2">
+                              <span style={{ fontSize: "15px" }}>{alljobs.companyName}</span><br />
+                              <span style={{ color: "#9a9a9a" }}>{alljobs.city?.city} - {alljobs.country?.country}</span>
+                            </div>
+                          </div>
+                          <p
+                            className="m-0 text-muted"
+                            dangerouslySetInnerHTML={{
+                              __html: alljobs.description.length > 200 ? alljobs.description.slice(0, 200) + ".." : alljobs.description,
+                            }}
+                          ></p>
+                          <span style={{ color: "green", fontWeight: "550" }}>{formatDate(alljobs.createdAt)}</span>
+                          <hr />
+                        </div>
+                      </Link>
+
+                    ))}
+
                   </div>
                 </Col>
+                {colAdjust === 6 && (
+                  <Col md={6}>
+                    <Outlet />
+                  </Col>
+                )}
               </Row>
             </Col>
           </Row>

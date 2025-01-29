@@ -15,11 +15,13 @@ export default function JobApplyForm({ jobApplyId }) {
         currentSalary: "",
         expectedSalary: "",
         relocation: "",
+        profession: "",
         resume: ""
     })
 
     const jobApplyForm = [
         { name: "name", val: signUser.name, type: "text", placeH: "Name", conId: "floatingInput", lab: "Name", star: "*" },
+        { name: "profession", val: jobApplyCredentails.profession, type: "text", placeH: "Profession", conId: "floatingInput", lab: "Profession", star: "*" },
         { name: "email", val: signUser.email, type: "text", placeH: "Email", conId: "floatingInput", lab: "Email", star: "*" },
         { name: "contact", val: signUser.number, type: "text", placeH: "Number", conId: "floatingInput", lab: "Number", star: "*" },
         { name: "resume", type: "File", placeH: "Resume", conId: "floatingInput", lab: "Resume", star: "*" },
@@ -48,10 +50,11 @@ export default function JobApplyForm({ jobApplyId }) {
         e.preventDefault()
         const { name, email, number } = signUser
         const jobId = jobApplyId;
-        const { relocation, expectedSalary, currentSalary, resume } = jobApplyCredentails
+        const { relocation, expectedSalary, currentSalary, resume, profession } = jobApplyCredentails
         const status = "Pending"
         const formData = new FormData()
         formData.append("name", name)
+        formData.append("profession", profession)
         formData.append("email", email)
         formData.append("number", number)
         formData.append("jobId", jobId)
@@ -70,14 +73,17 @@ export default function JobApplyForm({ jobApplyId }) {
         data.message !== undefined ? userFormError.innerText = data.message : userFormError.innerText = ""
         if (res.ok) {
             Swal.fire({
-                text: "Job application submitted successfully!",
-                icon: "success"
+                position: "center",
+                icon: "success",
+                title: "Job application sent successfully!",
+                showConfirmButton: true,
             });
             appliedJobs()
             setJobApplyCredentials({
                 currentSalary: "",
                 expectedSalary: "",
                 relocation: "",
+                profession: "",
                 resume: ""
             })
         }
@@ -103,10 +109,10 @@ export default function JobApplyForm({ jobApplyId }) {
     return (
         <>
             {signUser && signUser.name ? (
-                <Button onClick={() => setLgShow(true)} disabled={disableApply}>Apply Now</Button>
+                <Button onClick={() => setLgShow(true)} disabled={disableApply} style={{padding: "5px 40px"}}>Apply Now</Button>
             ) : (
                 <div>
-                    <Button onClick={() => applyNowCLick()}>Apply Now</Button>
+                    <Button onClick={() => applyNowCLick()} style={{padding: "5px 40px"}}>Apply Now</Button>
                 </div>
             )}
 

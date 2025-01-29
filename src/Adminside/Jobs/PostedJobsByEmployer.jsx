@@ -17,7 +17,7 @@ function PostedJobsByEmployer() {
   // Filter first, then slice for pagination
   const lastJobIndex = currentPage * pendingJobsPerPage;
   const firstJobIndex = lastJobIndex - pendingJobsPerPage;
-  const currentPendingJobs = pendingJobs.slice(firstJobIndex, lastJobIndex);
+  const currentPendingJobs = pendingJobs?.filter(post => post.userId?.role.includes(role)).reverse().slice(firstJobIndex, lastJobIndex);
 
   const totalPages = Math.ceil(pendingJobs.length / pendingJobsPerPage);
 
@@ -70,7 +70,7 @@ function PostedJobsByEmployer() {
           </thead>
           <tbody>
             {currentPendingJobs.length > 0 ? (
-              currentPendingJobs.filter(post => post.userId?.role.includes(role)).reverse().map((post, index) => (
+              currentPendingJobs.map((post, index) => (
                 <tr key={post._id}>
                   <td>{firstJobIndex + index + 1}</td>
                   <td>{post.title || "Title Missing"}</td>

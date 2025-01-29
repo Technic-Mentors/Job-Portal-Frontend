@@ -21,7 +21,7 @@ function PendingJobSeekers() {
   const [itemsPerPage, setItemsPerPage] = useState(25)
   const jobSeekersPerPage = itemsPerPage;
 
-  const pendingJobSeekers = userJobSeeker?.filter(seekerPost => seekerPost.status === "Pending");
+  const pendingJobSeekers = userJobSeeker?.filter(seekerPost => seekerPost.status === "Pending").reverse();
   const totalPages = Math.ceil((pendingJobSeekers?.length || 0) / jobSeekersPerPage);
 
   const lastUserIndex = currentPage * jobSeekersPerPage;
@@ -41,7 +41,7 @@ function PendingJobSeekers() {
 
   return (
     <>
-    <h2>Pending Job Seekers List</h2>
+      <h2>Pending Job Seekers List</h2>
       <div>
         <p>Show <select name="" id="" onChange={(e) => setItemsPerPage(e.target.value)}>
           <option value="25">25</option>

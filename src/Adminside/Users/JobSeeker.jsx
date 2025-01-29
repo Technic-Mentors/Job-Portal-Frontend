@@ -16,7 +16,7 @@ function JobSeekerUser() {
   const jobSeekers = addedUsers?.filter((user) => user.role === "Job Seaker") || [];
   const lastUserIndex = currentPage * userPerPage;
   const firstUserIndex = lastUserIndex - userPerPage;
-  const currentUsers = jobSeekers.slice(firstUserIndex, lastUserIndex);
+  const currentUsers = jobSeekers?.reverse().slice(firstUserIndex, lastUserIndex);
 
   const totalPages = Math.ceil(jobSeekers.length / userPerPage);
 
@@ -51,7 +51,7 @@ function JobSeekerUser() {
             </tr>
           </thead>
           <tbody>
-            {currentUsers.reverse().map((user, index) => (
+            {currentUsers.map((user, index) => (
               <tr key={user._id}>
                 <td>{firstUserIndex + index + 1}</td>
                 <td>{user.name}</td>

@@ -28,7 +28,7 @@ export default function AllJobCities() {
     const jobCityPerPage = itemsPerPage;
     const totalItems = jobCity?.length || 0;
     const totalPages = Math.ceil(totalItems / jobCityPerPage);
-    const {signUser} = useContext(UserContext)
+    const { signUser } = useContext(UserContext)
 
     useEffect(() => {
         // Ensure pagination resets to the first page if total items change
@@ -91,7 +91,7 @@ export default function AllJobCities() {
     // Calculate items to display on the current page
     const startIndex = (currentPage - 1) * jobCityPerPage;
     const currentItems = jobCity
-        ? jobCity.slice(startIndex, startIndex + jobCityPerPage)
+        ? jobCity.filter(post => post.countryId?._id.includes(searchCountry)).reverse().slice(startIndex, startIndex + jobCityPerPage)
         : [];
 
     // Calculate "X of Y" format
@@ -105,7 +105,7 @@ export default function AllJobCities() {
                 {signUser.role === "Employer" ? (
                     <p></p>
                 ) : (
-                <AddCityModal />
+                    <AddCityModal />
                 )}
             </div>
 
@@ -140,7 +140,7 @@ export default function AllJobCities() {
                         </tr>
                     </thead>
                     <tbody>
-                        {currentItems.filter(post => post.countryId?._id.includes(searchCountry)).map((post, index) => (
+                        {currentItems.map((post, index) => (
                             <tr key={index}>
                                 <td>{itemStart + index}</td>
                                 <td>{post.countryId?.country}</td>
